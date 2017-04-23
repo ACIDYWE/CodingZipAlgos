@@ -4,42 +4,48 @@ use std::env;
 use getopts::Options;
 use std::fs::File;
 
-struct State {
-    file: String,
-    mode: bool,
-}
 
 fn print_usage(binary: &str, opts: &Options) {
-    let brief = format!("Usage: {} [options]", binary);
+    let brief = format!("💩 💩 💩  Usage: {} [options]", binary);
     print!("{}", opts.usage(&brief));
 }
 
 fn main() {
-    let mut state = State {file: String::from(""), mode: false};
     let args: Vec<String> = env::args().collect();
     let bin_name = args[0].clone();
     let mut opts = Options::new();
-
+    let mut IN_FILE;
+    
     opts.optopt("f", "file", "input file", "NAME");
-    opts.optflag("d", "decode", "decoding mode (encoding as default}");
+    opts.optopt("d", "decode", "decoding mode (encoding as default)", "NAME");
     let matches = match opts.parse(&args[1..]) {
         Ok(v) => { v }
         Err(r) => { panic!(r.to_string()) }
     };
     
     if matches.opt_present("f") {
-        state.file = matches.opt_str("f").unwrap();
+        IN_FILE = File::open(matches.opt_str("f").unwrap()).unwrap();
     } else {
         print_usage(&bin_name, &opts);
         return;
     }
 
-    //if matched '-d' flag, then enable decode mode
-    state.mode = matches.opt_present("d");
+    if matches.opt_present("d") {
+        let mut statistic = File::open(matches.opt_str("d").unwrap()).unwrap();
+        haff_decode(& mut IN_FILE, & mut statistic);
+    } else {
+        haff_encode(& mut IN_FILE);
+    }
 
-    let mut IN_FILE = File::open(state.file).unwrap();
-    let mut OUT_FILE = File::create("haff.out").unwrap();
+    //let mut OUT_FILE = File::create("haff.out").unwrap();
 
 
-    
+}
+
+fn haff_decode(file: & mut File, stats: & mut File) {
+
+}
+
+fn haff_encode(file: & mut File) {
+
 }
