@@ -4,3 +4,5 @@ version = "0.1.0"
 authors = ["mostik"]
 
 [dependencies]
+#![feature(rustc_private)]
+getopts = "0.2.14"
