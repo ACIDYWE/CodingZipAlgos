@@ -1,8 +1,7 @@
 use std::fs::File;
 use std::collections::HashMap;
-use std::io::Read;
-use std::io::Write;
-
+use std::io::{Read, Write, Seek};
+use std::io::SeekFrom::Start;
 
 #[derive(Clone)]
 pub struct Node {
@@ -39,12 +38,12 @@ impl Haffman {
         let mut have_l = true;
         
         match tree.right {
-            Some(node) => { self.build_dict(*node , String::from("1") + &code); }
+            Some(node) => { self.build_dict(*node , code.clone() + "1"); }
             None => { have_r = false; }
         }
 
         match tree.left {
-            Some(node) => { self.build_dict(*node, String::from("0") + &code); }
+            Some(node) => { self.build_dict(*node, code.clone() + "0"); }
             None => { have_l = false; }
         }
 
@@ -93,8 +92,8 @@ impl Haffman {
 
         } else {
 
-            for j in 1..pairs.len() {
-                for i in 0..j {
+            for _ in 0..pairs.len() {
+                for i in 0..(pairs.len()-1) {
                     if pairs[i].freq > pairs[i+1].freq {
                         pairs.swap(i, i+1);
                     }
@@ -117,7 +116,7 @@ impl Haffman {
 
     pub fn show_stats(&self) {
         match self.stats {
-            Some(ref val) => {  for (i, j) in val.iter() { println!("{} - {}", i, j);} }
+            Some(ref val) => {  for (i, j) in val.iter() { let tmp = *i as u8 as char; println!("{} - {}", tmp, j);} }
             None => println!("Не сукец ¯\\_(ツ)_/¯")
         }
     }
@@ -126,7 +125,8 @@ impl Haffman {
         match self.dict {
             Some(ref dict) => {
                 for (i, j) in dict.iter() {
-                    println!("`{}` - {}", i, j);
+                    let tmp = *i as u8 as char;
+                    println!("`{}` - {}", tmp, j);
                 }
             }
 
@@ -139,23 +139,49 @@ impl Haffman {
         let tree = self.build_tree();
         self.build_dict(tree, String::from(""));
         
-        let mut out = File::create("haff.out").unwrap();
-        
-        let file = &self.file;
+        let mut out = File::create("haff.enc").unwrap();
         
         let dict = match self.dict {
             Some(ref dict) => dict,
             None => panic!("kek")
         };
 
-
+        let file  = &mut self.file;
+        let _ = file.seek(Start(0));
         for i in file.bytes() {
             let i = i.unwrap() as usize;
             out.write(&(dict[&i].clone().into_bytes())[..]).unwrap();
+            out.flush();
         }
     }
 
-    pub fn decode(&self, enc_str: String) {
+    pub fn decode(&self, to_decode: File) {
+        let mut dec_dict = HashMap::new();
+        let dict = match self.dict {
+            Some(ref val) => val,
+            None => panic!("lolwut")
+        };
 
+        for (key, val) in dict.iter() {
+            dec_dict.insert(val.clone(), key.clone());
+        }
+
+        let mut out = File::create("haff.dec").unwrap();
+        let mut buf = String::new();
+        for i in to_decode.bytes() {
+            match i {
+                Ok(49) => { buf.push('1'); },
+                Ok(48) => { buf.push('0'); },
+                _ => panic!("Error while decoding"),
+            };
+
+            if dec_dict.contains_key(&buf) {
+                //fuck you fucking rust -___- DAFUCK IS THIS
+                let tmp = dec_dict[&buf] as u8 as char; //<-----
+                write!(out, "{}", tmp).unwrap();
+                out.flush();
+                buf.clear();
+            }
+        }
     }
 }

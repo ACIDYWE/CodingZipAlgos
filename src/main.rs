@@ -31,6 +31,7 @@ fn main() {
         haffy.encode();
         //haffy.show_stats();
         haffy.show_dict();
+        haffy.decode(File::open("haff.enc").unwrap());
 
     } else {
         print_usage(&bin_name, &opts);
