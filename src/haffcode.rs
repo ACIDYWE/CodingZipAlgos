@@ -151,7 +151,7 @@ impl Haffman {
 
         for i in file.bytes() {
             let i = i.unwrap() as usize;
-            out.write(&(dict[&i].into_bytes())[..]).unwrap();
+            out.write(&(dict[&i].clone().into_bytes())[..]).unwrap();
         }
     }
 
