@@ -136,11 +136,18 @@ impl Haffman {
 
     pub fn encode(& mut self) {
         self.collect_stats();
+
+        //check for empty file -___-
+        //but its a bit retarded
+        match self.stats {
+            Some(ref val) => { if val.len() == 0 { panic!("Are you retarded?"); } },
+            None => ()
+        }
+
         let tree = self.build_tree();
         self.build_dict(tree, String::from(""));
         
         let mut out = File::create("haff.enc").unwrap();
-        
         let dict = match self.dict {
             Some(ref dict) => dict,
             None => panic!("kek")
