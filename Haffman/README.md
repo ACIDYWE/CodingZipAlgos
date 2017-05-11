@@ -1,3 +1,3 @@
 Huffman implementation
 ------------------
-yeah i know that `Haffman` not correct -____-
+yeah i know that `Haffman` is not correct -____-
