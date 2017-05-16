@@ -158,7 +158,7 @@ impl Haffman {
         for i in file.bytes() {
             let i = i.unwrap() as usize;
             out.write(&(dict[&i].clone().into_bytes())[..]).unwrap();
-            out.flush();
+            let _ = out.flush();
         }
     }
 
@@ -186,7 +186,7 @@ impl Haffman {
                 //fuck you fucking rust -___- DAFUCK IS THIS
                 let tmp = dec_dict[&buf] as u8 as char; //<-----
                 write!(out, "{}", tmp).unwrap();
-                out.flush();
+                let _ = out.flush();
                 buf.clear();
             }
         }

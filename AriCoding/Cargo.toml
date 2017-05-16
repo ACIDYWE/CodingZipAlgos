@@ -1,0 +1,6 @@
+[package]
+name = "coding_zip_algos"
+version = "0.1.0"
+authors = ["mostik"]
+
+[dependencies]
